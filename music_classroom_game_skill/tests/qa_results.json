@@ -1,0 +1,74 @@
+{
+  "G1_source_smoke": {
+    "data": {
+      "a": 6,
+      "b": 6,
+      "c": 3,
+      "legal": true,
+      "slots": 3,
+      "palette": 9
+    },
+    "random_changed": true,
+    "audio_state_after_click": "running",
+    "errors": [],
+    "external_requests": []
+  },
+  "G2_source_smoke": {
+    "data": {
+      "leftBars": 6,
+      "rightEvents": 17,
+      "duration": 10.160431,
+      "canvas": [
+        1280,
+        720
+      ],
+      "modes": 4
+    },
+    "mode_after_click": "left",
+    "started_after_click": true,
+    "start_overlay_visible": false,
+    "audio_state": "playing",
+    "reset": {
+      "started": false,
+      "score": 0,
+      "combo": 0,
+      "hits": 0,
+      "misses": 0,
+      "overlay": "block"
+    },
+    "errors": [],
+    "external_requests": []
+  },
+  "G3_generated_from_skill": {
+    "self_test": {
+      "rhythmValid": true,
+      "exactlyOne": true,
+      "roundCount": 6,
+      "pass": true
+    },
+    "audio_state_after_click": "running",
+    "first_answer": {
+      "score": "100",
+      "feedback": "正确。第4拍是小切分：十六—八—十六。中间的八分音符跨过拍中位置，使听觉重心向拍内移动，所以它和“二八”的均分感不同。",
+      "next_enabled": true
+    },
+    "finish": {
+      "result_visible": true,
+      "final_score": "600",
+      "game_visible": false
+    },
+    "wrong_path": {
+      "score": "0",
+      "revealed_correct": true,
+      "revealed_wrong": true
+    },
+    "desktop_errors": [],
+    "external_requests": [],
+    "mobile": {
+      "overflow_px": 0,
+      "min_button_height": 52,
+      "errors": [],
+      "external_requests": []
+    }
+  }
+}
