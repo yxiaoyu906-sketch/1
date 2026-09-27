@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>G1 三拍节奏改编</title>
+<style>
+:root{--bg:#101325;--panel:rgba(15,23,42,.92);--gold:#f6c65b;--cyan:#58d9ff;--red:#ff5b6e;--ink:#f8fafc;--muted:#cbd5e1}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%;background:radial-gradient(circle at 75% 10%,#5b315e 0,#20172f 38%,#0b1020 82%);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",sans-serif}body{overflow:auto}.app{width:min(1180px,100vw);margin:auto;padding:max(12px,env(safe-area-inset-top)) 14px max(18px,env(safe-area-inset-bottom))}
+header{display:flex;gap:18px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;padding:6px 4px 10px}h1{margin:0;font-size:clamp(25px,3.2vw,42px)}.subtitle{font-size:clamp(14px,1.5vw,18px);color:#f5d0fe}.tag{background:#ffffff12;border:1px solid #ffffff28;border-radius:999px;padding:8px 12px;font-size:14px;color:#fde68a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.card,.creator,.analysis{background:var(--panel);border:1px solid #ffffff28;border-radius:18px;box-shadow:0 12px 28px #0005;overflow:hidden}.card{padding:14px}.card h2,.creator h2,.analysis h2{font-size:20px;margin:0 0 8px}.desc{color:var(--muted);font-size:14px;line-height:1.65;min-height:46px}
+.pattern{background:linear-gradient(#fffdf7,#fff7e4);color:#111827;border:2px solid #ead7ad;border-radius:14px;min-height:128px;padding:18px 8px 12px;display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}.bar{display:flex;align-items:center;gap:10px;border-left:3px solid #111;border-right:0;padding:25px 14px 7px;position:relative;min-height:88px}.bar:last-child{border-right:6px double #111}.bar+.bar{margin-left:0}.barNo{position:absolute;top:4px;left:8px;font:700 11px sans-serif;color:#64748b}.beat{position:relative;min-width:62px;height:55px;display:flex;align-items:center;justify-content:center}.xgrp{display:inline-flex;gap:5px;align-items:flex-end;position:relative;padding-bottom:10px;font:900 31px/1 "Times New Roman",serif}.x{display:inline-block;position:relative;padding:0 1px}.beat.accentBeat .xgrp>.x:first-of-type::before,.slot.accentSlot .xgrp>.x:first-of-type::before{content:">";position:absolute;left:50%;top:-14px;transform:translateX(-50%);color:#dc2626;font:900 16px/1 Arial,sans-serif;z-index:8;pointer-events:none}.xgrp.line1:after{content:"";position:absolute;left:1px;right:1px;bottom:5px;border-bottom:3px solid #111}.xgrp.line2:before{content:"";position:absolute;left:1px;right:1px;bottom:0;border-bottom:3px solid #111}.xgrp.extraRight:before{content:"";position:absolute;left:34%;right:1px;bottom:0;border-bottom:3px solid #111}.xgrp.extraLeft:before{content:"";position:absolute;left:1px;right:34%;bottom:0;border-bottom:3px solid #111}.x.extra2:after{content:"";position:absolute;left:0;right:0;bottom:-10px;border-bottom:3px solid #111}.dot{font-size:22px;margin-left:-3px;margin-right:-3px;margin-bottom:3px}.triplet{position:relative}.triplet .tripletNo{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font:700 14px sans-serif}.triplet .tripletArc{position:absolute;left:3px;right:3px;top:-8px;border-top:2px solid #111;border-radius:50%;height:8px}.sep{font-size:24px;color:#64748b}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}button{min-height:50px;border:0;border-radius:12px;padding:10px 16px;font-size:16px;font-weight:800;color:#fff;background:#334155;box-shadow:0 4px 14px #0005;cursor:pointer;touch-action:manipulation}button.primary{background:linear-gradient(180deg,#8b5cf6,#6d28d9)}button.orig{background:linear-gradient(180deg,#f59e0b,#d97706)}button.c{background:linear-gradient(180deg,#10b981,#047857)}button:active{transform:scale(.985)}
+.creator{margin-top:14px;padding:14px}.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 0 12px}.slot{min-height:104px;background:#fffaf0;color:#111827;border:3px solid transparent;border-radius:14px;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;cursor:pointer}.slot.selected{border-color:#38bdf8;box-shadow:0 0 0 3px #38bdf833}.slot .num{font-size:13px;color:#64748b;position:absolute;top:6px;left:9px}.slotName{font-size:12px;color:#475569;margin-top:7px}.palette{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.choice{background:#fff;color:#111827;border-radius:12px;min-height:86px;padding:7px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #e5e7eb;cursor:pointer}.choice:active{border-color:#38bdf8}.choice .nm{font-size:12px;color:#475569;margin-top:5px}.safe{font-size:12px;color:#bbf7d0;margin-top:7px}
+.analysis{margin-top:14px;padding:14px;background:linear-gradient(145deg,rgba(15,23,42,.95),rgba(30,41,59,.93))}#aiTitle{color:#fde68a;font-weight:900}#aiText{line-height:1.72;font-size:16px;margin-top:6px}.final{margin-top:9px;padding:10px 12px;border-left:4px solid #f59e0b;background:#f59e0b16;color:#fef3c7;border-radius:8px}.smallbtn{font-size:13px;min-height:42px;padding:7px 10px}.foot{margin:12px 2px 0;color:#94a3b8;font-size:12px;line-height:1.6}.rotate{display:none}
+@media(max-width:760px){.grid{grid-template-columns:1fr}.palette{grid-template-columns:repeat(3,1fr)}.pattern{gap:5px}.bar{padding:7px 8px;gap:4px}.beat{min-width:43px}.xgrp{font-size:26px}.actions button{flex:1 1 44%}}@media(orientation:portrait) and (max-width:760px){.rotate{display:block;position:sticky;top:0;z-index:99;background:#f59e0b;color:#111827;text-align:center;padding:7px;font-weight:800;border-radius:0 0 10px 10px}}
+
+/* 9.27：参考B两小节固定同一行 */
+#patB{flex-wrap:nowrap!important;gap:0!important;padding-left:4px!important;padding-right:4px!important;overflow:visible}
+#patB .bar{flex:1 1 50%;min-width:0;gap:5px;padding-left:8px;padding-right:8px}
+#patB .beat{min-width:38px}
+#patB .xgrp{font-size:27px;gap:3px}
+#patB .barNo{font-size:10px}
+@media(max-width:900px){
+  #patB .bar{gap:3px;padding-left:4px;padding-right:4px}
+  #patB .beat{min-width:30px}
+  #patB .xgrp{font-size:22px;gap:2px}
+  #patB .accentBeat .xgrp>.x:first-of-type::before{top:-13px;font-size:14px}
+}
+</style></head><body><div class="rotate">建议横屏操作，节奏型和按钮会更清楚</div><div class="app">
+<header><div><h1>G1 三拍节奏改编</h1><div class="subtitle">参考A（基础三拍×2） → 参考B（《军队波兰舞曲》典型节奏×2） → 学生C自主创编</div></div><div class="tag">3/4拍｜每拍时值严格核对｜每个参考均循环两小节</div></header>
+<div class="grid">
+<section class="card"><h2>参考A｜最基础的三拍（循环两次）</h2><div class="desc">每拍一个四分节奏，第一拍加重。先让学生稳定感受“强—弱—弱”的两小节循环，再与原作典型节奏比较。</div><div class="pattern" id="patA"></div><div class="actions"><button class="primary" onclick="playRef('A')">▶ 播放参考A ×2</button></div></section>
+<section class="card"><h2>参考B｜《军队波兰舞曲》典型三拍（循环两次）</h2><div class="desc">每小节采用“前八后十六｜二八｜二八”的典型波兰舞曲节奏骨架，连续两小节保持同一三拍重心。</div><div class="pattern" id="patB"></div><div class="actions"><button class="primary" onclick="playRef('B')">▶ 播放参考B ×2</button><button class="orig" onclick="playOriginal()">🎧 回听原作开头</button></div></section>
+</div>
+<section class="creator"><h2>学生C版｜自己创作一小节三拍节奏</h2><div class="desc">点击下方第1、2、3拍，再选择一个<strong>时值恰好等于1拍</strong>的简谱节奏型；播放时自动循环两小节，便于与A、B在相同时长下比较。</div><div class="slots" id="slots"></div><div class="palette" id="palette"></div><div class="safe">✓ 已核查：一拍、二八、四十六、前八后十六、前十六后八、三连音、小附点、后小附点、小切分均严格等于1拍。</div><div class="actions"><button class="c" onclick="playC()">▶ 播放我的C版 ×2</button><button onclick="compareABC()">A → B → C 连续比较</button><button class="orig" onclick="finalWhy()">AI专业总结：为什么原作用B</button><button class="smallbtn" onclick="randomC()">随机生成合法C版</button></div></section>
+<section class="analysis"><div id="aiTitle">AI音乐分析</div><div id="aiText">先播放参考A、参考B，再创作C版。每次播放完成后，这里会从<strong>重心、拍内疏密、推进感和步伐感</strong>四个角度给出专业分析。</div><div class="final" id="finalBox">比较的重点不是“哪条更好听”，而是听清不同拍内细分怎样改变同一个三拍框架的步伐性格。</div></section>
+<div class="foot">课堂版说明：AI点评为离线规则分析，不上传学生数据、不依赖网络；参考B是为初中课堂提炼的原作典型节奏骨架，仍需配合“回听原作”按钮完成真实作品聆听。</div>
+<audio id="origB" preload="auto" src="assets/polonaise_excerpt.ogg"></audio>
+<script>
+const beatSec=.72;
+const P={
+ q:{name:'一拍',on:[0],density:1,html:'<span class="xgrp"><span class="x">X</span></span>'},
+ ee:{name:'二八',on:[0,.5],density:2,html:'<span class="xgrp line1"><span class="x">X</span><span class="x">X</span></span>'},
+ ssss:{name:'四十六',on:[0,.25,.5,.75],density:4,html:'<span class="xgrp line1 line2"><span class="x">X</span><span class="x">X</span><span class="x">X</span><span class="x">X</span></span>'},
+ eSS:{name:'前八后十六',on:[0,.5,.75],density:3,html:'<span class="xgrp line1 extraRight"><span class="x">X</span><span class="x">X</span><span class="x">X</span></span>'},
+ SSe:{name:'前十六后八',on:[0,.25,.5],density:3,html:'<span class="xgrp line1 extraLeft"><span class="x">X</span><span class="x">X</span><span class="x">X</span></span>'},
+ tri:{name:'三连音',on:[0,1/3,2/3],density:3,html:'<span class="xgrp line1 triplet"><span class="tripletNo">3</span><span class="tripletArc"></span><span class="x">X</span><span class="x">X</span><span class="x">X</span></span>'},
+ dot:{name:'小附点',on:[0,.75],density:2,html:'<span class="xgrp line1"><span class="x">X</span><span class="dot">·</span><span class="x extra2">X</span></span>'},
+ backdot:{name:'后小附点',on:[0,.25],density:2,html:'<span class="xgrp line1"><span class="x extra2">X</span><span class="x">X</span><span class="dot">·</span></span>'},
+ sync:{name:'小切分',on:[0,.25,.75],density:3,html:'<span class="xgrp line1"><span class="x extra2">X</span><span class="x">X</span><span class="x extra2">X</span></span>'}
+};
+const A=['q','q','q','q','q','q'];
+const B=['eSS','ee','ee','eSS','ee','ee'];
+let C=['q','ee','ee'],activeSlot=0,audioCtx=null,timers=[];
+function beat(k,i){return `<div class="beat ${i%3===0?'accentBeat':''}">${P[k].html}</div>`}
+function renderPattern(el,arr){let out='';for(let m=0;m<2;m++){out+=`<div class="bar"><span class="barNo">第${m+1}小节</span>${arr.slice(m*3,m*3+3).map((k,i)=>beat(k,i)).join('')}</div>`}document.getElementById(el).innerHTML=out}
+function renderSlots(){document.getElementById('slots').innerHTML=C.map((k,i)=>`<div class="slot ${i===0?'accentSlot ':''}${i===activeSlot?'selected':''}" onclick="selectSlot(${i})"><span class="num">第${i+1}拍</span>${P[k].html}<span class="slotName">${P[k].name}</span></div>`).join('')}
+function renderPalette(){document.getElementById('palette').innerHTML=Object.entries(P).map(([k,p])=>`<div class="choice" onclick="choose('${k}')">${p.html}<div class="nm">${p.name}</div></div>`).join('')}
+function selectSlot(i){activeSlot=i;renderSlots()}function choose(k){C[activeSlot]=k;renderSlots();analyseC(false)}
+function ensureCtx(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}
+function clickTone(at,accent=false,sub=false){ensureCtx();const o=audioCtx.createOscillator(),g=audioCtx.createGain(),o2=audioCtx.createOscillator(),g2=audioCtx.createGain();o.type=accent?'square':'triangle';o.frequency.value=accent?145:(sub?810:560);g.gain.setValueAtTime(accent?.62:.18,at);g.gain.exponentialRampToValueAtTime(.001,at+(accent?.22:.075));o.connect(g).connect(audioCtx.destination);o.start(at);o.stop(at+(accent?.24:.09));if(accent){o2.type='sine';o2.frequency.value=82;g2.gain.setValueAtTime(.46,at);g2.gain.exponentialRampToValueAtTime(.001,at+.28);o2.connect(g2).connect(audioCtx.destination);o2.start(at);o2.stop(at+.3)}}
+function playArray(arr,onDone){ensureCtx();timers.forEach(clearTimeout);timers=[];let t=audioCtx.currentTime+.08;arr.forEach((k,bi)=>{P[k].on.forEach((f,oi)=>clickTone(t+(bi+f)*beatSec,bi%3===0&&oi===0,oi>0))});const dur=arr.length*beatSec;timers.push(setTimeout(onDone,dur*1000+120));return dur}
+function setAI(title,text){document.getElementById('aiTitle').textContent=title;document.getElementById('aiText').innerHTML=text}
+function playRef(k){if(k==='A')playArray(A,()=>setAI('AI点评｜参考A（基础三拍×2）','<b>重心：</b>两小节的第一拍都最明确。<br><b>步伐感：</b>三个等长拍点形成均匀、方整、稳定的“落地—抬起—准备”，适合先建立3/4拍框架。<br><b>局限：</b>拍内没有进一步细分，推进力较朴素。'));else playArray(B,()=>setAI('AI点评｜参考B（原作典型节奏×2）','<b>重心：</b>每小节第一拍仍然稳固，但第一拍内部由“前八后十六”产生更明显的向前牵引。<br><b>步伐感：</b>第二、三拍的二八继续保持流动，因而比A更有弹性、行进性和舞蹈性。<br><b>作品联系：</b>这种节奏既保留波兰舞曲庄重的第一拍，又避免三拍平均化。'))}
+function playOriginal(){const a=document.getElementById('origB');a.currentTime=0;a.play();setAI('回听原作｜《A大调波兰舞曲》开头','正在播放原作开头片段。请把注意力放在第一拍的落地重心，以及同一拍内部由长到短的推动感。原作包含和声、力度和乐句层次，参考B只是提炼其典型节奏骨架。');a.onended=()=>finalWhy()}
+function analyseC(){const dens=C.map(k=>P[k].density),sum=dens.reduce((a,b)=>a+b,0),names=C.map(k=>P[k].name);let feel=sum<=4?'整体较疏，步幅更宽、更稳；':sum<=7?'疏密适中，既有落地感也有推进；':'拍内音点较密，推进感和兴奋度更强；';if(C.includes('sync'))feel+='小切分会把重心向拍内牵引，步伐更灵活；';if(C.includes('tri'))feel+='三连音使拍内流动更圆转；';if(C.includes('dot')||C.includes('backdot'))feel+='附点造成长短不均，步态更有弹性；';const bMatch=(C[0]==='eSS'&&C[1]==='ee'&&C[2]==='ee');setAI('AI点评｜学生C版',`<b>你的节奏：</b>${names.join('｜')}。<br><b>听感：</b>${feel}<br><b>与A相比：</b>${sum>3?'细分更多，推进更强':'接近基础三拍，重心最稳定'}。<br><b>与B相比：</b>${bMatch?'你已经复现原作典型节奏骨架':'你改变了拍内疏密，因此步伐性格也随之改变'}。`)}
+function playC(){playArray([...C,...C],()=>analyseC())}
+function compareABC(){ensureCtx();let d=playArray(A,()=>setAI('连续比较','参考A播放完毕，接着播放参考B。'));timers.push(setTimeout(()=>{let d2=playArray(B,()=>setAI('连续比较','参考B播放完毕，接着播放你的C版。'));timers.push(setTimeout(()=>playC(),d2*1000+350))},d*1000+350))}
+function finalWhy(){setAI('AI专业总结｜为什么《军队波兰舞曲》最终使用自己的三拍节奏？','从专业音乐分析看，<b>参考A提供的是“拍号骨架”</b>：它让3/4拍的强—弱—弱关系最清楚，但三个拍点过于平均，难以单独形成波兰舞曲特有的步态。<br><br><b>原作典型节奏把第一拍进一步细分为“前八后十六”</b>，在强拍内部先稳住再迅速向前推进；随后第二、三拍用连续二八维持流动。这样既不削弱第一拍的庄重重心，又形成更有弹性和方向感的行进。<br><br>因此《军队波兰舞曲》采用这种节奏，不只是为了“更复杂”，而是让<b>三拍子的舞步性、进行感与作品雄健、坚定的气质</b>同时成立。学生C版的价值就在于亲自改变拍内细分，再听见步伐性格怎样发生变化。')}
+function randomC(){const ks=Object.keys(P);C=C.map(()=>ks[Math.floor(Math.random()*ks.length)]);renderSlots();analyseC(false)}
+renderPattern('patA',A);renderPattern('patB',B);renderSlots();renderPalette();
+</script></div></body></html>
