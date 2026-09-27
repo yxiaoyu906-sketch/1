@@ -1,0 +1,9 @@
+SKILL.md
+README.md
+scripts/validate_game.py
+examples/G3_小切分侦探_单文件网页版.html
+tests/QA_REPORT.md
+tests/qa_results.json
+tests/G3_desktop_after_answer.png
+tests/G3_mobile.png
+tests/run_qa.py
