@@ -1,0 +1,42 @@
+{
+  "ok": true,
+  "static": {
+    "doctype_html": true,
+    "viewport": true,
+    "inline_script": true,
+    "no_external_script_src": true,
+    "no_external_stylesheet": true,
+    "no_fetch_http": true,
+    "no_xhr_http": true,
+    "has_user_action": true,
+    "not_empty": true
+  },
+  "browser": {
+    "desktop": {
+      "title": "G3 小切分侦探｜找出重心位移的一拍",
+      "buttons": 8,
+      "horizontal_overflow_px": 0,
+      "self_test": {
+        "rhythmValid": true,
+        "exactlyOne": true,
+        "roundCount": 6,
+        "pass": true
+      },
+      "page_errors": [],
+      "external_requests": []
+    },
+    "mobile": {
+      "title": "G3 小切分侦探｜找出重心位移的一拍",
+      "buttons": 8,
+      "horizontal_overflow_px": 0,
+      "self_test": {
+        "rhythmValid": true,
+        "exactlyOne": true,
+        "roundCount": 6,
+        "pass": true
+      },
+      "page_errors": [],
+      "external_requests": []
+    }
+  }
+}
