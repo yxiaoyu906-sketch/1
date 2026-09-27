@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>G3 小切分侦探｜找出重心位移的一拍</title>
+<style>
+:root{--bg:#08111f;--panel:#101c31;--ink:#f8fafc;--muted:#b9c5d7;--gold:#f7c95d;--cyan:#67e8f9;--red:#fb7185;--green:#6ee7b7}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:radial-gradient(circle at 78% 5%,#233a66 0,#0b1730 38%,#050b16 100%);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",sans-serif}
+body{padding:max(10px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom));overflow-x:hidden}
+.app{width:min(980px,100%);margin:auto}.top{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}.top h1{margin:0;font-size:clamp(27px,4vw,46px)}
+.sub{color:#c7d2fe;margin-top:7px;line-height:1.55}.stats{display:flex;gap:8px;flex-wrap:wrap}.pill{background:#ffffff12;border:1px solid #ffffff25;border-radius:999px;padding:8px 12px;font-size:14px}.pill b{color:var(--gold)}
+.card{margin-top:14px;background:rgba(16,28,49,.94);border:1px solid #ffffff24;border-radius:20px;padding:16px;box-shadow:0 14px 34px #0007}.instruction{font-size:17px;line-height:1.7;color:#e2e8f0}.instruction strong{color:var(--gold)}
+.stage{margin-top:14px;background:linear-gradient(#fffdf6,#fff6dc);border-radius:18px;color:#142033;padding:16px;min-height:190px;display:flex;flex-direction:column;justify-content:center}.beats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.beat{min-height:108px;border:2px solid #d7caa9;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;background:#fff}.beatNo{position:absolute;top:7px;left:9px;color:#64748b;font-size:12px;font-weight:800}.beat.hidden .rhythm{filter:blur(7px);opacity:.24}.beat.correct{border-color:#10b981;box-shadow:0 0 0 3px #10b98133}.beat.wrong{border-color:#f43f5e;box-shadow:0 0 0 3px #f43f5e33}.rhythm{font:900 31px/1.1 "Times New Roman",serif;letter-spacing:5px;transition:.2s}.name{margin-top:10px;font-size:12px;color:#64748b;font-weight:700}
+.controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button{border:0;border-radius:14px;min-height:52px;padding:10px 17px;color:white;background:#334155;font-size:16px;font-weight:900;cursor:pointer;touch-action:manipulation;box-shadow:0 5px 15px #0005}button:active{transform:scale(.985)}button.primary{background:linear-gradient(#8b5cf6,#6d28d9)}button.next{background:linear-gradient(#0ea5e9,#0369a1)}button:disabled{opacity:.45;cursor:not-allowed}.answerRow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.answerRow button{background:linear-gradient(#164e63,#155e75);font-size:19px}.answerRow button.good{background:linear-gradient(#059669,#047857)}.answerRow button.bad{background:linear-gradient(#e11d48,#9f1239)}
+.feedback{margin-top:14px;min-height:98px;border-left:4px solid var(--gold);background:#ffffff09;border-radius:10px;padding:12px 14px;line-height:1.75;color:#e2e8f0}.feedback b{color:#fde68a}.teacher{margin-top:10px;color:#94a3b8;font-size:12px;line-height:1.6}.result{display:none;text-align:center;padding:22px}.result .big{font-size:52px;font-weight:950;color:var(--gold)}
+@media(max-width:650px){.beats{grid-template-columns:repeat(2,1fr)}.answerRow{grid-template-columns:repeat(2,1fr)}.stage{min-height:300px}.top{display:block}.stats{margin-top:10px}.controls button{flex:1 1 42%}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div><h1>G3 小切分侦探</h1><div class="sub">只用耳朵找出：四拍中，哪一拍发生了<strong>拍内重心位移</strong>？</div></div>
+    <div class="stats"><span class="pill">题目 <b id="roundStat">1/6</b></span><span class="pill">得分 <b id="scoreStat">0</b></span><span class="pill">正确率 <b id="accStat">100%</b></span></div>
+  </div>
+
+  <section class="card" id="gameCard">
+    <div class="instruction"><strong>玩法：</strong>先点“播放本题”，闭眼也可以。四拍中只有一拍是<strong>小切分（十六—八—十六）</strong>，听完后选择第几拍。作答后再看节奏图验证。</div>
+    <div class="stage"><div class="beats" id="beats"></div></div>
+    <div class="controls"><button class="primary" id="playBtn">▶ 播放本题</button><button id="replayBtn">↻ 再听一次</button><button class="next" id="nextBtn" disabled>下一题 →</button></div>
+    <div class="answerRow" id="answers"></div>
+    <div class="feedback" id="feedback">先聆听，再判断。注意：不要只数音的多少，要听<strong>第二个音是否把重心从拍点向拍内牵引</strong>。</div>
+    <div class="teacher">课堂用途：约3—5分钟。此页使用离线 Web Audio 合成节奏音，不上传数据、不依赖网络。节奏图在作答后才揭示，避免先看后听。</div>
+  </section>
+
+  <section class="card result" id="result">
+    <div>本轮完成</div><div class="big" id="finalScore">0</div><div id="finalText"></div>
+    <div class="controls" style="justify-content:center"><button class="primary" id="againBtn">再来一轮</button></div>
+  </section>
+</div>
+<script>
+const CELLS={
+ q:{name:'一拍',on:[0],symbol:'X'},
+ ee:{name:'二八',on:[0,.5],symbol:'X X'},
+ sync:{name:'小切分',on:[0,.25,.75],symbol:'X X—X'}
+};
+const TOTAL_ROUNDS=6, beatSec=.62;
+let audioCtx=null, round=0, score=0, correct=0, answered=false, current=null, playToken=0;
+const beatsEl=document.getElementById('beats'), answersEl=document.getElementById('answers'), feedback=document.getElementById('feedback');
+function ensureAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}
+function tone(at,accent,sub){ensureAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=accent?'square':'triangle';o.frequency.value=accent?155:(sub?760:540);const vol=accent?.34:.16;g.gain.setValueAtTime(vol,at);g.gain.exponentialRampToValueAtTime(.001,at+.085);o.connect(g).connect(audioCtx.destination);o.start(at);o.stop(at+.1)}
+function makeQuestion(){const syncBeat=Math.floor(Math.random()*4);const cells=[];for(let i=0;i<4;i++)cells.push(i===syncBeat?'sync':(Math.random()<.5?'q':'ee'));return{syncBeat,cells}}
+function renderQuestion(){current=makeQuestion();answered=false;playToken++;document.getElementById('nextBtn').disabled=true;beatsEl.innerHTML=current.cells.map((k,i)=>`<div class="beat hidden" data-i="${i}"><span class="beatNo">第${i+1}拍</span><div class="rhythm">${CELLS[k].symbol}</div><div class="name">作答后揭示</div></div>`).join('');answersEl.innerHTML=[0,1,2,3].map(i=>`<button data-i="${i}">第${i+1}拍</button>`).join('');answersEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>answer(Number(b.dataset.i))));feedback.innerHTML='先聆听，再判断。注意：不要只数音的多少，要听<strong>第二个音是否把重心从拍点向拍内牵引</strong>。';updateStats()}
+function playQuestion(){ensureAudio();const token=++playToken;const start=audioCtx.currentTime+.08;current.cells.forEach((key,bi)=>{CELLS[key].on.forEach((f,oi)=>tone(start+(bi+f)*beatSec,bi===0&&oi===0,oi>0))});feedback.textContent='正在播放……请把注意力放在每一拍内部的长短关系和重心位置。';setTimeout(()=>{if(token===playToken&&!answered)feedback.innerHTML='听完了。请选择<strong>第几拍</strong>出现小切分。';},4*beatSec*1000+140)}
+function reveal(choice){beatsEl.querySelectorAll('.beat').forEach((el,i)=>{el.classList.remove('hidden');el.querySelector('.name').textContent=CELLS[current.cells[i]].name;if(i===current.syncBeat)el.classList.add('correct');if(i===choice&&choice!==current.syncBeat)el.classList.add('wrong')});answersEl.querySelectorAll('button').forEach((b,i)=>{b.disabled=true;if(i===current.syncBeat)b.classList.add('good');else if(i===choice)b.classList.add('bad')})}
+function answer(choice){if(answered)return;answered=true;const ok=choice===current.syncBeat;if(ok){score+=100;correct++;feedback.innerHTML=`<b>正确。</b>第${current.syncBeat+1}拍是小切分：十六—八—十六。中间的八分音符跨过拍中位置，使听觉重心向拍内移动，所以它和“二八”的均分感不同。`}else{feedback.innerHTML=`这一题在<b>第${current.syncBeat+1}拍</b>。小切分不是“音更多”这么简单，而是中间较长的音跨过拍内中点，造成重心位移。现在看节奏图，再点“再听一次”确认。`}reveal(choice);document.getElementById('nextBtn').disabled=false;updateStats()}
+function updateStats(){document.getElementById('roundStat').textContent=`${Math.min(round+1,TOTAL_ROUNDS)}/${TOTAL_ROUNDS}`;document.getElementById('scoreStat').textContent=score;document.getElementById('accStat').textContent=(round+answered?Math.round(correct/(round+1)*100):100)+'%'}
+function next(){if(!answered)return;if(round>=TOTAL_ROUNDS-1){finish();return}round++;renderQuestion()}
+function finish(){document.getElementById('gameCard').style.display='none';const r=document.getElementById('result');r.style.display='block';document.getElementById('finalScore').textContent=score;document.getElementById('finalText').innerHTML=`共 ${TOTAL_ROUNDS} 题，正确 ${correct} 题。<br>回到作品聆听时，可以继续追问：<b>作曲家为什么要把某一拍的重心推向拍内？</b>`}
+function reset(){round=0;score=0;correct=0;answered=false;document.getElementById('gameCard').style.display='block';document.getElementById('result').style.display='none';renderQuestion()}
+document.getElementById('playBtn').addEventListener('click',playQuestion);document.getElementById('replayBtn').addEventListener('click',playQuestion);document.getElementById('nextBtn').addEventListener('click',next);document.getElementById('againBtn').addEventListener('click',reset);
+window.__musicGameMeta={
+  target:'听辨四拍中发生小切分与拍内重心位移的一拍',
+  offline:true,
+  selfTest(){
+    const rhythmValid=Object.values(CELLS).every(c=>c.on.length>0&&c.on.every(x=>x>=0&&x<1));
+    const samples=Array.from({length:100},makeQuestion);
+    const exactlyOne=samples.every(q=>q.cells.filter(x=>x==='sync').length===1&&q.cells[q.syncBeat]==='sync');
+    return{rhythmValid,exactlyOne,roundCount:TOTAL_ROUNDS,pass:rhythmValid&&exactlyOne&&TOTAL_ROUNDS===6};
+  }
+};
+reset();
+</script>
+</body>
+</html>
