@@ -56,10 +56,14 @@ var skin_material: Material
 var coat_materials: Array[Material] = []
 var completed_tasks: Dictionary = {}
 var lesson_introduced := false
+var build_complete := false
 
 
 func _ready() -> void:
 	add_to_group("warsaw_task_tracker")
+	var player := get_node_or_null("Player") as Player
+	if player:
+		player.set_controls_locked(true)
 	call_deferred("_build")
 
 
@@ -68,21 +72,44 @@ func _build() -> void:
 		return
 	if has_node("GeneratedWarsawStreet"):
 		get_node("GeneratedWarsawStreet").free()
+	build_complete = false
+	await _advance_loading("正在准备华沙场景", 0.76)
 	_prepare_materials()
 	var generated := Node3D.new()
 	generated.name = "GeneratedWarsawStreet"
 	add_child(generated)
 	_build_environment(generated)
+	await _advance_loading("正在准备华沙街道", 0.8)
 	_build_street(generated)
 	_build_rain(generated)
+	await _advance_loading("正在准备街道建筑", 0.84)
 	_build_buildings(generated)
 	_build_barricade(generated)
+	await _advance_loading("正在准备场景人物", 0.88)
 	_build_period_figures(generated)
+	await _advance_loading("正在准备场景氛围", 0.92)
 	_build_battle_atmosphere(generated)
+	await _advance_loading("正在准备交互内容", 0.95)
 	_build_interactions(generated)
 	_apply_touch_performance(generated)
 	_update_hud()
 	_configure_player_view()
+	await _advance_loading("场景已就绪，即将进入", 0.98)
+	# Render the complete street behind the opaque loading screen before revealing it.
+	for frame in range(6):
+		await get_tree().process_frame
+	build_complete = true
+	var player := get_node_or_null("Player") as Player
+	if player:
+		player.set_controls_locked(false)
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.completeWarsawTransition && window.completeWarsawTransition()", true)
+
+func _advance_loading(label: String, progress: float) -> void:
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.setWarsawTransitionProgress && window.setWarsawTransitionProgress(" + JSON.stringify(label) + "," + str(progress) + ")", true)
+	await get_tree().process_frame
+
 
 
 func _prepare_materials() -> void:

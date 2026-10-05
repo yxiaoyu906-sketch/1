@@ -264,6 +264,7 @@ func _configure_touch_rendering() -> void:
 
 func _configure_viewport_size() -> void:
 	var window := get_window()
+	window.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
 	var target := Vector2i(480, 760) if window.size.x < window.size.y else Vector2i(960, 540)
 	if window.content_scale_size != target:
 		window.content_scale_size = target

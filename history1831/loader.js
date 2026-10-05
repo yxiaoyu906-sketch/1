@@ -1,17 +1,22 @@
 'use strict';
-const VERSION='classroom-2';
+const VERSION='classroom-3';
 const originalFetch=window.fetch.bind(window);
 const byId=id=>document.getElementById(id);
 let manifest,engine,cachePromise,firstReceived=0,firstTotal=0;
 let secondaryPromise=null,secondaryData=null,secondaryReceived=0;
 let lastTap=0;
 window.warsawPackState='idle';
+window.warsawSceneState='idle';
+window.beginWarsawTransition=function(){byId('transition').hidden=false;byId('fullscreen').hidden=true;window.warsawSceneState='building';};
+window.setWarsawTransitionProgress=function(label,value){if(window.warsawSceneState==='building'){byId('transitionStatus').textContent=label;byId('transitionProgress').value=value;}};
+window.completeWarsawTransition=function(){window.warsawSceneState='ready';byId('transitionProgress').value=1;requestAnimationFrame(()=>requestAnimationFrame(()=>{byId('transition').hidden=true;byId('fullscreen').hidden=false;}));};
+function abortWarsawTransition(){window.warsawSceneState='error';byId('transition').hidden=true;byId('fullscreen').hidden=false;}
 const CACHE='history1831-verified-parts-v2';
 const pool={active:0,queue:[],limit:3,async run(task){if(this.active>=this.limit)await new Promise(resolve=>this.queue.push(resolve));this.active++;try{return await task();}finally{this.active--;this.queue.shift()?.();}}};
 function setStatus(text){byId('status').textContent=text;}
 function progress(part,phase){
  if(phase==='first'){firstReceived+=part.bytes;byId('progress').value=firstReceived;setStatus(`正在准备第一幕 ${Math.min(100,Math.round(firstReceived/firstTotal*100))}%`);}
- else {secondaryReceived+=part.bytes;const total=manifest.secondary['warsaw.pck'].compressedBytes;byId('transitionProgress').value=Math.min(1,secondaryReceived/total);byId('transitionStatus').textContent=`正在准备第二幕 ${Math.min(100,Math.round(secondaryReceived/total*100))}%`;}
+ else {secondaryReceived+=part.bytes;const total=manifest.secondary['warsaw.pck'].compressedBytes;byId('transitionProgress').value=Math.min(0.75,secondaryReceived/total*0.75);byId('transitionStatus').textContent=`正在准备第二幕 ${Math.min(100,Math.round(secondaryReceived/total*100))}%`;}
 }
 async function storageCache(){
  if(!cachePromise)cachePromise=(async()=>{try{return await caches.open(CACHE);}catch{return null;}})();
@@ -59,8 +64,8 @@ window.fetch=async function(input,init){
  return originalFetch(input,init);
 };
 window.prepareWarsawPack=async function(background=false){
- if(!background)byId('transition').hidden=false;
- if(window.warsawPackState==='ready'){if(!background)byId('transition').hidden=true;return;}
+ if(!background)window.beginWarsawTransition();
+ if(window.warsawPackState==='ready')return;
  if(!secondaryPromise){
   window.warsawPackState='loading';secondaryReceived=0;
   secondaryPromise=(async()=>{
@@ -69,15 +74,15 @@ window.prepareWarsawPack=async function(background=false){
    const file=manifest.secondary['warsaw.pck'];
    for(const part of file.parts)await partBytes(part,'second');
    return true;
-  })().catch(error=>{window.warsawPackState='error';secondaryPromise=null;byId('transitionStatus').textContent='第二幕下载未完成，点击出口可以重试。';byId('transition').hidden=true;throw error;});
+  })().catch(error=>{window.warsawPackState='error';secondaryPromise=null;byId('transitionStatus').textContent='第二幕下载未完成，点击出口可以重试。';if(!background)abortWarsawTransition();throw error;});
  }
  try{
   await secondaryPromise;
   if(background)return;
   if(!secondaryData)secondaryData=await new Response(decompressedStream(manifest.secondary['warsaw.pck'],'second')).arrayBuffer();
   engine.copyToFS('/warsaw.pck',secondaryData);
-  secondaryData=null;window.warsawPackState='ready';byId('transition').hidden=true;
- }catch(error){window.warsawPackState='error';byId('transition').hidden=true;console.error(error);}
+  secondaryData=null;window.warsawPackState='ready';byId('transitionStatus').textContent='正在打开华沙场景';byId('transitionProgress').value=0.75;
+ }catch(error){window.warsawPackState='error';if(!background)abortWarsawTransition();console.error(error);}
 };
 async function fullscreen(){
  try{
@@ -88,15 +93,23 @@ async function fullscreen(){
 function showMessage(text){byId('message').textContent=text;byId('message').hidden=false;setTimeout(()=>byId('message').hidden=true,4000);}
 byId('fullscreen').addEventListener('click',fullscreen);
 byId('coverFullscreen').addEventListener('click',fullscreen);
-function sizeCanvas(){const width=innerWidth,height=innerHeight,scale=Math.min(1,1280/Math.max(width,height));const canvas=byId('canvas');canvas.width=Math.round(width*scale);canvas.height=Math.round(height*scale);}
-sizeCanvas();window.addEventListener('resize',sizeCanvas);document.addEventListener('fullscreenchange',sizeCanvas);
+function viewportSize(){const view=window.visualViewport;return {width:Math.round(view?.width||innerWidth),height:Math.round(view?.height||innerHeight),left:view?.offsetLeft||0,top:view?.offsetTop||0};}
+window.classroomViewportInsets=function(){const view=viewportSize(),style=getComputedStyle(byId('safeInsets'));return [parseFloat(style.paddingLeft)||0,parseFloat(style.paddingTop)||0,parseFloat(style.paddingRight)||0,parseFloat(style.paddingBottom)||0,view.width,view.height].join(',');};
+function sizeCanvas(){
+ const view=viewportSize(),scale=Math.min(1,1280/Math.max(view.width,view.height)),canvas=byId('canvas');
+ canvas.style.width=view.width+'px';canvas.style.height=view.height+'px';canvas.style.left=view.left+'px';canvas.style.top=view.top+'px';
+ const width=Math.round(view.width*scale),height=Math.round(view.height*scale);if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;
+ document.documentElement.style.setProperty('--usable-height',view.height+'px');
+ byId('fullscreen').textContent=document.fullscreenElement||document.webkitFullscreenElement?'退出全屏':'全屏';
+}
+sizeCanvas();window.addEventListener('resize',sizeCanvas);window.visualViewport?.addEventListener('resize',sizeCanvas);window.visualViewport?.addEventListener('scroll',sizeCanvas);document.addEventListener('fullscreenchange',sizeCanvas);document.addEventListener('webkitfullscreenchange',sizeCanvas);
 byId('start').addEventListener('click',async()=>{
  if(engine)return;
  const button=byId('start');button.disabled=true;byId('precache').disabled=true;firstReceived=0;byId('progress').hidden=false;
  try{
   const missing=Engine.getMissingFeatures({threads:false});if(missing.length)throw Error('请使用支持三维场景的新版浏览器');
   await getManifest();firstTotal=Object.values(manifest.files).reduce((sum,file)=>sum+file.compressedBytes,0);byId('progress').max=firstTotal;
-  sizeCanvas();engine=new Engine({executable:'index',canvas:byId('canvas'),canvasResizePolicy:2,focusCanvas:true,args:[],fileSizes:{'index.pck':manifest.files['index.pck'].bytes,'index.wasm':manifest.files['index.wasm'].bytes},onPrint:console.log,onPrintError:console.error});
+  sizeCanvas();engine=new Engine({executable:'index',canvas:byId('canvas'),canvasResizePolicy:0,focusCanvas:true,args:[],fileSizes:{'index.pck':manifest.files['index.pck'].bytes,'index.wasm':manifest.files['index.wasm'].bytes},onPrint:console.log,onPrintError:console.error});
   window.gameEngine=engine;await engine.startGame();byId('cover').hidden=true;byId('fullscreen').hidden=false;byId('canvas').focus();window.gameReady=true;console.log('HISTORY_CLASSROOM_READY');
   setTimeout(()=>window.prepareWarsawPack(true),2500);
  }catch(error){setStatus(`加载未完成：${error.message}\n已下载的部分会保留，点击重试即可继续。`);engine=null;button.disabled=false;byId('precache').disabled=false;}

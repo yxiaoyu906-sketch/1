@@ -22,11 +22,13 @@ var touch_moves: Dictionary = {}
 var last_touch_msec := -1000
 var information_scroll: ScrollContainer
 var touch_navigation := false
+var browser_ui_scale := 1.0
 
 func _ready() -> void:
 	touch_navigation = OS.has_feature("mobile")
 	_configure_information_layout()
-	get_viewport().size_changed.connect(_resize_information_panel)
+	get_viewport().size_changed.connect(_resize_touch_layout)
+	call_deferred("_resize_touch_layout")
 	_bind_hold_button($SafeArea/MovePad/Up, &"move_forward")
 	_bind_hold_button($SafeArea/MovePad/Down, &"move_backwards")
 	_bind_hold_button($SafeArea/MovePad/Left, &"move_left")
@@ -357,3 +359,48 @@ func _resize_information_panel() -> void:
 func _set_browser_fullscreen_button(visible_button: bool) -> void:
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval('document.getElementById("fullscreen").hidden=' + ("false" if visible_button else "true"), true)
+
+func _place_touch_control(control: Control, bounds: Rect2) -> void:
+	control.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	control.position = bounds.position
+	control.size = bounds.size
+
+func _safe_touch_rect() -> Rect2:
+	var view := get_viewport().get_visible_rect()
+	var inset := Vector4(24.0, 18.0, 24.0, 24.0)
+	if OS.has_feature("web"):
+		var metrics = JavaScriptBridge.eval("window.classroomViewportInsets ? window.classroomViewportInsets() : ''", true)
+		var values := str(metrics).split(",")
+		if values.size() == 6:
+			var scale_x := view.size.x / maxf(values[4].to_float(), 1.0)
+			var scale_y := view.size.y / maxf(values[5].to_float(), 1.0)
+			browser_ui_scale = scale_y
+			inset.x += values[0].to_float() * scale_x
+			inset.y += values[1].to_float() * scale_y
+			inset.z += values[2].to_float() * scale_x
+			inset.w += values[3].to_float() * scale_y
+	return Rect2(view.position + Vector2(inset.x, inset.y), view.size - Vector2(inset.x + inset.z, inset.y + inset.w))
+
+func _resize_touch_layout() -> void:
+	_resize_information_panel()
+	var safe := _safe_touch_rect()
+	var edge := clampf(safe.size.y * 0.14, 76.0, 82.0)
+	var gap := 8.0
+	var span := edge * 3.0 + gap * 2.0
+	var pad := $SafeArea/MovePad as Control
+	_place_touch_control(pad, Rect2(Vector2(safe.position.x, safe.end.y - span), Vector2(span, span)))
+	var step := edge + gap
+	for key in {"Up": Vector2(step, 0), "Left": Vector2(0, step), "Right": Vector2(step * 2, step), "Down": Vector2(step, step * 2)}:
+		var position_in_pad: Vector2 = {"Up": Vector2(step, 0), "Left": Vector2(0, step), "Right": Vector2(step * 2, step), "Down": Vector2(step, step * 2)}[key]
+		_place_touch_control(pad.get_node(key), Rect2(position_in_pad, Vector2(edge, edge)))
+	var action_width := minf(168.0, safe.size.x * 0.32)
+	var action_height := 72.0
+	_place_touch_control(interact_button, Rect2(Vector2(safe.end.x-action_width, safe.end.y-action_height), Vector2(action_width, action_height)))
+	_place_touch_control($SafeArea/ResetView, Rect2(Vector2(safe.end.x-88.0, safe.end.y-action_height-76.0), Vector2(88,60)))
+	_place_touch_control($SafeArea/StandButton, Rect2(Vector2(safe.end.x-action_width, safe.end.y-action_height-76.0), Vector2(action_width,60)))
+	# Fullscreen is the upper-right browser control; keep sound immediately below it.
+	_place_touch_control($SafeArea/SoundToggle, Rect2(Vector2(safe.end.x-96.0, safe.position.y+maxf(72.0,60.0*browser_ui_scale)), Vector2(96,56)))
+	var header := $SafeArea/SceneHeader as Control
+	_place_touch_control(header, Rect2(safe.position, Vector2(minf(464.0, safe.size.x-120.0),84)))
+	$SafeArea/SceneHeader/VBox/Title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	$SafeArea/SceneHeader/VBox/Subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

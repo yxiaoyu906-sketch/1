@@ -22,6 +22,7 @@ func interact(player: Player) -> void:
 				return
 			await get_tree().create_timer(0.1).timeout
 		if not ProjectSettings.load_resource_pack("/warsaw.pck", false):
+			JavaScriptBridge.eval("window.abortWarsawTransition && window.abortWarsawTransition()", true)
 			changing_scene = false
 			player.set_controls_locked(false)
 			player.touch_hud.show_notice("第二幕资源载入失败，请重新打开网页")

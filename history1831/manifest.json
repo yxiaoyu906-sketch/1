@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-05-classroom-2",
+  "version": "2026-10-05-classroom-3",
   "files": {
     "index.wasm": {
       "bytes": 39514754,
@@ -23,13 +23,13 @@
       ]
     },
     "index.pck": {
-      "bytes": 19380732,
-      "compressedBytes": 17495717,
+      "bytes": 19384940,
+      "compressedBytes": 17496970,
       "parts": [
         {
           "file": "classroom-room.pck.gz.part000",
           "bytes": 2097152,
-          "sha256": "33b14a0b78481b73b467ca299e496b3844ae377c33610af142cf5fbf659f737c"
+          "sha256": "769b9f10f388e8083fcef50a902286c677859071e2fcce3f7b38ab5bfb9c4348"
         },
         {
           "file": "classroom-room.pck.gz.part001",
@@ -68,8 +68,8 @@
         },
         {
           "file": "classroom-room.pck.gz.part008",
-          "bytes": 718501,
-          "sha256": "776f33f988e8d11bfb37d232cb7a387323784cbfe5c97e7ca9a8df9d92aa55f8"
+          "bytes": 719754,
+          "sha256": "4a9332129983c4769673b6f6acb26c00d5e73b18718c2d8903dd82134cb313fd"
         }
       ]
     }
