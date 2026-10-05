@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-05",
+  "godot": "4.7.2",
+  "desktopBrowserFullFlow": "PASS",
+  "checkpoints": 27,
+  "interactionPages": 13,
+  "characters": 17,
+  "mobileBrowserEmulation": "PASS",
+  "realPhoneTest": "NOT_TESTED",
+  "firstDownloadBytes": 153369166
+}

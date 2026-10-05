@@ -1,0 +1,1 @@
+ENOENT: no such file or directory, open '/private/tmp/GODOT_LICENSE.txt'
