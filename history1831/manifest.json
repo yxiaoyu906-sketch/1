@@ -1,5 +1,5 @@
 {
-  "version": "2026-10-05-classroom-3",
+  "version": "2026-10-06-classroom-4",
   "files": {
     "index.wasm": {
       "bytes": 39514754,
@@ -23,131 +23,196 @@
       ]
     },
     "index.pck": {
-      "bytes": 19384940,
-      "compressedBytes": 17496970,
+      "bytes": 28037916,
+      "compressedBytes": 26216879,
       "parts": [
         {
           "file": "classroom-room.pck.gz.part000",
           "bytes": 2097152,
-          "sha256": "769b9f10f388e8083fcef50a902286c677859071e2fcce3f7b38ab5bfb9c4348"
+          "sha256": "2b415bc94dad433f01ad26cd1429b3015e72d785f590556c28295edae491a361"
         },
         {
           "file": "classroom-room.pck.gz.part001",
           "bytes": 2097152,
-          "sha256": "5f40875b5f8b0607a3c50e1ce9be9c811eeab55846a7badbc50ddfadf196bbcc"
+          "sha256": "4dbd75e26b5ca6c1529a338adbcaeabda34ab98e81227b52c896637b6a387c4a"
         },
         {
           "file": "classroom-room.pck.gz.part002",
           "bytes": 2097152,
-          "sha256": "340798c484b428ee6f20d7972adbc3b2eb30013fd452b89837866de42f5993b8"
+          "sha256": "39eb0fefca4ea64c1e94f42eb58ac6ce5016ac0a5891c8a59ace88d6e6710050"
         },
         {
           "file": "classroom-room.pck.gz.part003",
           "bytes": 2097152,
-          "sha256": "19711896df65d9a7d12d51944edadb299311007081bf64c4c6ae6242836ff944"
+          "sha256": "10a3fad789dfe36eae4d0191b2faeee90d3eda505eabf3a8b97147ac56a9a93d"
         },
         {
           "file": "classroom-room.pck.gz.part004",
           "bytes": 2097152,
-          "sha256": "4112594d598089f664bf2727a0c005c20bb343f2b77088fd8f84ccbb8d76c2ad"
+          "sha256": "e817c1ac8e775922871d5617c608b95fa60cfe683e892bd093949564fc99b5e0"
         },
         {
           "file": "classroom-room.pck.gz.part005",
           "bytes": 2097152,
-          "sha256": "95e310bd1b49e9c5e1c651e8d61979305680a99b57265f97b34782d169a206d8"
+          "sha256": "e03bd354253ffe55017873a0870f4a49f21bc4780a43a6af08dc233613e0ac52"
         },
         {
           "file": "classroom-room.pck.gz.part006",
           "bytes": 2097152,
-          "sha256": "384756875a1ac9d71a3f0c51c9a2e98cee956dea8347cbaba26e8f6c4b097c38"
+          "sha256": "580d17605fb37ca414b297184d2c52c03e8219ff56ac459268d5a0a34f04c66b"
         },
         {
           "file": "classroom-room.pck.gz.part007",
           "bytes": 2097152,
-          "sha256": "12746affdafe56ef2fdb2a31a906b01b56683a3fb13536c00594456bc291c343"
+          "sha256": "00d1c1b81ba71ec842e72cf43210a694122a86e1a2b9e5db5302ddfd595bfed7"
         },
         {
           "file": "classroom-room.pck.gz.part008",
-          "bytes": 719754,
-          "sha256": "4a9332129983c4769673b6f6acb26c00d5e73b18718c2d8903dd82134cb313fd"
+          "bytes": 2097152,
+          "sha256": "bbe97af021ea10409bf225ecbf11b3889b8c0f4d8e18300a6a6611b263ee8a4c"
+        },
+        {
+          "file": "classroom-room.pck.gz.part009",
+          "bytes": 2097152,
+          "sha256": "cd6576c36affed3fc65cbe643c105bb30c04983d07eedd9bdf4d86bbd8e3b1a9"
+        },
+        {
+          "file": "classroom-room.pck.gz.part010",
+          "bytes": 2097152,
+          "sha256": "591cd46d2e4954ea50cfd0bdbe189e65ed10715e058c3c7eff143c5e02f7ab42"
+        },
+        {
+          "file": "classroom-room.pck.gz.part011",
+          "bytes": 2097152,
+          "sha256": "e8ee0641049ae7184f293eeb3ef0d5c796d4ab12fcd4d3de852c2c1b5b3d7d83"
+        },
+        {
+          "file": "classroom-room.pck.gz.part012",
+          "bytes": 1051055,
+          "sha256": "dbe2881403519783a03a7b43c20726f223d2d757933820d4472e448dcba5dd8f"
         }
       ]
     }
   },
   "secondary": {
     "warsaw.pck": {
-      "bytes": 28494308,
-      "compressedBytes": 27352920,
+      "bytes": 48994276,
+      "compressedBytes": 47845886,
       "parts": [
         {
           "file": "classroom-warsaw.pck.gz.part000",
           "bytes": 2097152,
-          "sha256": "56c110c2ecd362a19e33fac77fa2b286c0761dee1be4cbd1940d810a6926e2ff"
+          "sha256": "9beb1e3c770dbb4d27dd44d78b2dc2abc7d2af87859e760708dc488a3044aeeb"
         },
         {
           "file": "classroom-warsaw.pck.gz.part001",
           "bytes": 2097152,
-          "sha256": "b0d471fef2db8bb7f6cae246c523dbdfac6d5fd10c3cd84d8dce16d6d937a96b"
+          "sha256": "9dc229312850e2a91df627ab3f8b08a24c1ca3c2cae5af192bbf919e5649df06"
         },
         {
           "file": "classroom-warsaw.pck.gz.part002",
           "bytes": 2097152,
-          "sha256": "97b6398895bea3f406cb19fcd12b53f35598f94ff9b93a44d5531e8b2227189b"
+          "sha256": "5f99ef699ce2744aa4d1bc06f3389730286b38f0fd3122a3c7f65a786a8b879e"
         },
         {
           "file": "classroom-warsaw.pck.gz.part003",
           "bytes": 2097152,
-          "sha256": "e20d70aed4309c6735ec22a2adc9d5c66be3dd0ed195bccc659e9d6b21f5a2e1"
+          "sha256": "1beb53ecf3c5ccce07c31c4d6f84878a58fe893824ac3a03dff7765ab5de7022"
         },
         {
           "file": "classroom-warsaw.pck.gz.part004",
           "bytes": 2097152,
-          "sha256": "c24d538fb003ae88941b603378ac1353006f751e8e29486219b65e5d812f69f8"
+          "sha256": "2569bfd9bc541939a7e52075bf59ce1708b81429acd8dd187f94af577577c78c"
         },
         {
           "file": "classroom-warsaw.pck.gz.part005",
           "bytes": 2097152,
-          "sha256": "5371b91ef5f2ab5b64ec6509721f2a93ebb00557c9f48aa34e3891a755d888e5"
+          "sha256": "4de0d31f3823e7eee8e540ffca6cad04835c48045ab4e20702defc838d6c6331"
         },
         {
           "file": "classroom-warsaw.pck.gz.part006",
           "bytes": 2097152,
-          "sha256": "2c4ebfbc3d425805df4926e140ef560414f956bbcd3ac478df8115a0cad306d4"
+          "sha256": "bc2d5f7697ecf8ee771245aed3ffffd2d2812d25842b1b50de88fb3428ef34f3"
         },
         {
           "file": "classroom-warsaw.pck.gz.part007",
           "bytes": 2097152,
-          "sha256": "8e788850d6f9f4504f1db9313023243a0846efc63646ec4758ce96384748d106"
+          "sha256": "915ce1750509a41c460bd6acba110853de7b73659e256ecb80c9cae18e84c01b"
         },
         {
           "file": "classroom-warsaw.pck.gz.part008",
           "bytes": 2097152,
-          "sha256": "b98d5142b86262eadee582f62a5214426c80069bde84e44f0757f7b2f7bf2cfd"
+          "sha256": "9d7971aa621eff7d9f8e0b1ddb51ebb1190c96079910eae540b4fac6a6621941"
         },
         {
           "file": "classroom-warsaw.pck.gz.part009",
           "bytes": 2097152,
-          "sha256": "e12840d9d42bc45824283820b3d60a27e3b63681362e56da5a5ef7810607fac1"
+          "sha256": "3f1c8be9667b49d9ad388734678a568e2c3da4e95f0641d043a3348adb27f4c9"
         },
         {
           "file": "classroom-warsaw.pck.gz.part010",
           "bytes": 2097152,
-          "sha256": "8ea216ff7657ec4261f185c7495164180fafe85bb6420f4430c1686d71807624"
+          "sha256": "dda39b04e6a169da98ae62c29b14ad9ac344accbb892e078e279d8b8b14962bd"
         },
         {
           "file": "classroom-warsaw.pck.gz.part011",
           "bytes": 2097152,
-          "sha256": "491024cb9db52ed40820245008b6cf8f8bdcfcc0c212c4dc44288b4d88ffab5e"
+          "sha256": "156d46dbe77d1201bd432dac8b9c2ad16934615e855adf0d0bd87287c8e2f234"
         },
         {
           "file": "classroom-warsaw.pck.gz.part012",
           "bytes": 2097152,
-          "sha256": "7a1b2b23e02b93c41866cad04ab8c686183c0c2cc85789a385393e13160cf9fc"
+          "sha256": "69f72d20326ee31a1c092a7285a512ff27a2077b4ea23365c21c1e1ec775ebbf"
         },
         {
           "file": "classroom-warsaw.pck.gz.part013",
-          "bytes": 89944,
-          "sha256": "0b03a2f01ede7538e7c6ccdd58069606a6498bfbca094c9a2cabba3d1ddd13ec"
+          "bytes": 2097152,
+          "sha256": "9244cc56eb07fd2219d1f84ca4a3d4fda7bb3ff31d1ee95996937227e175d161"
+        },
+        {
+          "file": "classroom-warsaw.pck.gz.part014",
+          "bytes": 2097152,
+          "sha256": "5a5c6cd2c6b92f4bf2f96473293b475970e7248f43a70fb41176c7d437e6231c"
+        },
+        {
+          "file": "classroom-warsaw.pck.gz.part015",
+          "bytes": 2097152,
+          "sha256": "50e9ee898963b669751e8731e702c52f67cdc9ace02b14bab38c4206c86801c5"
+        },
+        {
+          "file": "classroom-warsaw.pck.gz.part016",
+          "bytes": 2097152,
+          "sha256": "69312151cf918546889c5b6e330fc85a2961ddedf79187cad00b8b280cb33308"
+        },
+        {
+          "file": "classroom-warsaw.pck.gz.part017",
+          "bytes": 2097152,
+          "sha256": "926f8d157d0b06eac5461cf9356fe2403805672619d7a90b72ad505f0951db4a"
+        },
+        {
+          "file": "classroom-warsaw.pck.gz.part018",
+          "bytes": 2097152,
+          "sha256": "a405afd2dac77290eeaf4713f7d97e5e6a11e6c69b891d815b3723a322bb62be"
+        },
+        {
+          "file": "classroom-warsaw.pck.gz.part019",
+          "bytes": 2097152,
+          "sha256": "4b12cd28e52a2b552dc47a61d84cd70d5a1ffe7ba613ffb1875418de842fed56"
+        },
+        {
+          "file": "classroom-warsaw.pck.gz.part020",
+          "bytes": 2097152,
+          "sha256": "de5dffcc1a68aff73fa99e4fb1d7bc33a11a56ddcd7064ae59ed14864bc030e8"
+        },
+        {
+          "file": "classroom-warsaw.pck.gz.part021",
+          "bytes": 2097152,
+          "sha256": "c007ecff74f914e84a7979aa7b79f75cc24492a3a5dbfb13cf29d9540ac8a870"
+        },
+        {
+          "file": "classroom-warsaw.pck.gz.part022",
+          "bytes": 1708542,
+          "sha256": "4a399d9c2001902c536800fa7651904637f8b32c8f2a9b18e044b1ddcefa33a7"
         }
       ]
     }

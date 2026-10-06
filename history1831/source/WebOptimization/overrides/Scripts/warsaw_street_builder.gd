@@ -95,6 +95,9 @@ func _build() -> void:
 	_update_hud()
 	_configure_player_view()
 	await _advance_loading("场景已就绪，即将进入", 0.98)
+	var warming_player := get_node_or_null("Player") as Player
+	if warming_player:
+		await warming_player.warm_up_view()
 	# Render the complete street behind the opaque loading screen before revealing it.
 	for frame in range(6):
 		await get_tree().process_frame
@@ -1265,5 +1268,5 @@ func _apply_touch_performance(root: Node) -> void:
 			node.distance_fade_enabled = true
 			node.distance_fade_begin = 7.0
 			node.distance_fade_length = 4.0
-	get_viewport().msaa_3d = Viewport.MSAA_DISABLED
-	get_viewport().scaling_3d_scale = 0.75
+	get_viewport().msaa_3d = Viewport.MSAA_2X
+	get_viewport().scaling_3d_scale = 1.0

@@ -1,5 +1,5 @@
 'use strict';
-const VERSION='classroom-3';
+const VERSION='classroom-4';
 const originalFetch=window.fetch.bind(window);
 const byId=id=>document.getElementById(id);
 let manifest,engine,cachePromise,firstReceived=0,firstTotal=0;
@@ -7,6 +7,13 @@ let secondaryPromise=null,secondaryData=null,secondaryReceived=0;
 let lastTap=0;
 window.warsawPackState='idle';
 window.warsawSceneState='idle';
+window.firstSceneReady=false;
+let secondaryForeground=false;
+const activeGestures=new Set();let lastGestureEnd=-Infinity;
+byId('canvas').addEventListener('pointerdown',event=>activeGestures.add(event.pointerId),{passive:true});
+for(const type of ['pointerup','pointercancel'])window.addEventListener(type,event=>{activeGestures.delete(event.pointerId);lastGestureEnd=performance.now();},{passive:true});
+window.addEventListener('blur',()=>{activeGestures.clear();lastGestureEnd=performance.now();});
+async function waitForIdleDownload(){while(!secondaryForeground&&(activeGestures.size>0||performance.now()-lastGestureEnd<600))await new Promise(resolve=>setTimeout(resolve,100));}
 window.beginWarsawTransition=function(){byId('transition').hidden=false;byId('fullscreen').hidden=true;window.warsawSceneState='building';};
 window.setWarsawTransitionProgress=function(label,value){if(window.warsawSceneState==='building'){byId('transitionStatus').textContent=label;byId('transitionProgress').value=value;}};
 window.completeWarsawTransition=function(){window.warsawSceneState='ready';byId('transitionProgress').value=1;requestAnimationFrame(()=>requestAnimationFrame(()=>{byId('transition').hidden=true;byId('fullscreen').hidden=false;}));};
@@ -64,7 +71,7 @@ window.fetch=async function(input,init){
  return originalFetch(input,init);
 };
 window.prepareWarsawPack=async function(background=false){
- if(!background)window.beginWarsawTransition();
+ if(!background){secondaryForeground=true;window.beginWarsawTransition();}
  if(window.warsawPackState==='ready')return;
  if(!secondaryPromise){
   window.warsawPackState='loading';secondaryReceived=0;
@@ -72,7 +79,7 @@ window.prepareWarsawPack=async function(background=false){
    await getManifest();
    // Cache the compressed pieces in the background, then decode only at the scene transition.
    const file=manifest.secondary['warsaw.pck'];
-   for(const part of file.parts)await partBytes(part,'second');
+   for(const part of file.parts){if(background)await waitForIdleDownload();await partBytes(part,'second');}
    return true;
   })().catch(error=>{window.warsawPackState='error';secondaryPromise=null;byId('transitionStatus').textContent='第二幕下载未完成，点击出口可以重试。';if(!background)abortWarsawTransition();throw error;});
  }
@@ -96,7 +103,7 @@ byId('coverFullscreen').addEventListener('click',fullscreen);
 function viewportSize(){const view=window.visualViewport;return {width:Math.round(view?.width||innerWidth),height:Math.round(view?.height||innerHeight),left:view?.offsetLeft||0,top:view?.offsetTop||0};}
 window.classroomViewportInsets=function(){const view=viewportSize(),style=getComputedStyle(byId('safeInsets'));return [parseFloat(style.paddingLeft)||0,parseFloat(style.paddingTop)||0,parseFloat(style.paddingRight)||0,parseFloat(style.paddingBottom)||0,view.width,view.height].join(',');};
 function sizeCanvas(){
- const view=viewportSize(),scale=Math.min(1,1280/Math.max(view.width,view.height)),canvas=byId('canvas');
+ const view=viewportSize(),scale=Math.min(window.devicePixelRatio||1,2,2560/Math.max(view.width,view.height),Math.sqrt(3200000/(view.width*view.height))),canvas=byId('canvas');
  canvas.style.width=view.width+'px';canvas.style.height=view.height+'px';canvas.style.left=view.left+'px';canvas.style.top=view.top+'px';
  const width=Math.round(view.width*scale),height=Math.round(view.height*scale);if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;
  document.documentElement.style.setProperty('--usable-height',view.height+'px');
@@ -110,7 +117,7 @@ byId('start').addEventListener('click',async()=>{
   const missing=Engine.getMissingFeatures({threads:false});if(missing.length)throw Error('请使用支持三维场景的新版浏览器');
   await getManifest();firstTotal=Object.values(manifest.files).reduce((sum,file)=>sum+file.compressedBytes,0);byId('progress').max=firstTotal;
   sizeCanvas();engine=new Engine({executable:'index',canvas:byId('canvas'),canvasResizePolicy:0,focusCanvas:true,args:[],fileSizes:{'index.pck':manifest.files['index.pck'].bytes,'index.wasm':manifest.files['index.wasm'].bytes},onPrint:console.log,onPrintError:console.error});
-  window.gameEngine=engine;await engine.startGame();byId('cover').hidden=true;byId('fullscreen').hidden=false;byId('canvas').focus();window.gameReady=true;console.log('HISTORY_CLASSROOM_READY');
+  window.gameEngine=engine;await engine.startGame();setStatus('正在准备清晰场景画面…');while(!window.firstSceneReady)await new Promise(resolve=>setTimeout(resolve,50));byId('cover').hidden=true;byId('fullscreen').hidden=false;byId('canvas').focus();window.gameReady=true;console.log('HISTORY_CLASSROOM_READY');
   setTimeout(()=>window.prepareWarsawPack(true),2500);
  }catch(error){setStatus(`加载未完成：${error.message}\n已下载的部分会保留，点击重试即可继续。`);engine=null;button.disabled=false;byId('precache').disabled=false;}
 });

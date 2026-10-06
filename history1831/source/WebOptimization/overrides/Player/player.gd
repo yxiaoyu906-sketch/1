@@ -10,6 +10,7 @@ class_name Player extends CharacterBody3D
 var mouse_captured: bool = false
 var pending_touch_look := Vector2.ZERO
 var interaction_refresh := 0.0
+var render_warmup_complete := false
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 
@@ -45,12 +46,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		if mouse_captured: _rotate_camera()
 	if Input.is_action_just_pressed(&"exit"): get_tree().quit()
 
-func _physics_process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if not pending_touch_look.is_zero_approx():
-		look_dir = pending_touch_look.limit_length(32.0) * 0.0022
+		# Consume all gesture displacement once per rendered frame, independent of event batching.
+		look_dir = pending_touch_look * (540.0 / maxf(get_viewport().get_visible_rect().size.y, 1.0)) * 0.0022
 		_rotate_camera()
 		pending_touch_look = Vector2.ZERO
 		look_dir = Vector2.ZERO
+
+func _physics_process(delta: float) -> void:
 	if controls_locked:
 		velocity = Vector3.ZERO
 		walk_vel = Vector3.ZERO
@@ -81,7 +85,7 @@ func _rotate_camera(sens_mod: float = 1.0) -> void:
 func apply_touch_look(relative: Vector2) -> void:
 	if controls_locked and not seated:
 		return
-	pending_touch_look += relative.limit_length(40.0)
+	pending_touch_look += relative
 
 func stop_touch_look() -> void:
 	pending_touch_look = Vector2.ZERO
@@ -249,8 +253,8 @@ func _update_interaction_state() -> void:
 
 func _configure_touch_rendering() -> void:
 	_configure_viewport_size()
-	get_viewport().msaa_3d = Viewport.MSAA_DISABLED
-	get_viewport().scaling_3d_scale = 0.75
+	get_viewport().msaa_3d = Viewport.MSAA_2X
+	get_viewport().scaling_3d_scale = 1.0
 	var scene := get_tree().current_scene
 	if scene == null:
 		return
@@ -261,6 +265,10 @@ func _configure_touch_rendering() -> void:
 			world.environment.ssao_enabled = false
 			world.environment.glow_enabled = false
 			world.environment.volumetric_fog_enabled = false
+	if scene.scene_file_path.ends_with("Stuttgart_Graybox.tscn"):
+		await warm_up_view()
+		if OS.has_feature("web"):
+			JavaScriptBridge.eval("window.firstSceneReady = true", true)
 
 func _configure_viewport_size() -> void:
 	var window := get_window()
@@ -268,3 +276,15 @@ func _configure_viewport_size() -> void:
 	var target := Vector2i(480, 760) if window.size.x < window.size.y else Vector2i(960, 540)
 	if window.content_scale_size != target:
 		window.content_scale_size = target
+
+func warm_up_view() -> void:
+	var original_rotation := camera.rotation
+	for step in range(8):
+		camera.rotation.y = original_rotation.y + TAU * step / 8.0
+		for frame in range(2):
+			await get_tree().process_frame
+	camera.rotation = original_rotation
+	stop_touch_look()
+	for frame in range(3):
+		await get_tree().process_frame
+	render_warmup_complete = true
