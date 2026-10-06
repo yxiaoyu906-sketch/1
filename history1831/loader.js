@@ -1,5 +1,5 @@
 'use strict';
-const VERSION='classroom-4';
+const VERSION='classroom-5';
 const originalFetch=window.fetch.bind(window);
 const byId=id=>document.getElementById(id);
 let manifest,engine,cachePromise,firstReceived=0,firstTotal=0;

@@ -19,6 +19,7 @@ var information_pages: Array[Dictionary] = []
 var information_page_index := 0
 var pending_task_completion := ""
 var touch_moves: Dictionary = {}
+var touch_positions: Dictionary = {}
 var last_touch_msec := -1000
 var information_scroll: ScrollContainer
 var touch_navigation := false
@@ -27,6 +28,7 @@ var browser_ui_scale := 1.0
 func _ready() -> void:
 	touch_navigation = OS.has_feature("mobile")
 	_configure_information_layout()
+	get_viewport().size_changed.connect(_release_touch_controls)
 	get_viewport().size_changed.connect(_resize_touch_layout)
 	call_deferred("_resize_touch_layout")
 	_bind_hold_button($SafeArea/MovePad/Up, &"move_forward")
@@ -35,7 +37,7 @@ func _ready() -> void:
 	_bind_hold_button($SafeArea/MovePad/Right, &"move_right")
 	$SafeArea/LookZone.gui_input.connect(_on_look_zone_input)
 	interact_button.pressed.connect(player.try_interact)
-	$SafeArea/ResetView.pressed.connect(player.reset_camera)
+	$SafeArea/ResetView.pressed.connect(_reset_view_pressed)
 	$SafeArea/SoundToggle.pressed.connect(_toggle_audio)
 	$SafeArea/InformationPanel/Margin/VBox/Next.pressed.connect(_show_next_information_page)
 	$SafeArea/InformationPanel/Margin/VBox/Close.pressed.connect(hide_information)
@@ -53,22 +55,31 @@ func _bind_hold_button(button: BaseButton, action: StringName) -> void:
 	button.button_down.connect(func() -> void: _mouse_move_press(action))
 	button.button_up.connect(func() -> void: _mouse_move_release(action))
 	button.mouse_exited.connect(func() -> void:
-		if Time.get_ticks_msec() - last_touch_msec > 700 and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		if _mouse_input_allowed() and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			Input.action_release(action)
 	)
 
 func _mouse_move_press(action: StringName) -> void:
-	if Time.get_ticks_msec() - last_touch_msec > 700:
+	if _mouse_input_allowed():
 		Input.action_press(action)
 
 func _mouse_move_release(action: StringName) -> void:
-	if Time.get_ticks_msec() - last_touch_msec > 700:
+	if _mouse_input_allowed():
 		Input.action_release(action)
+
+func _mouse_input_allowed() -> bool:
+	# A held finger remains a touch gesture even after a pause with no drag events.
+	return touch_positions.is_empty() and Time.get_ticks_msec() - last_touch_msec > 700
+
+func _reset_view_pressed() -> void:
+	if look_touch_index == -1 and touch_moves.is_empty():
+		player.reset_camera()
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		last_touch_msec = Time.get_ticks_msec()
 		if event.pressed:
+			touch_positions[event.index] = event.position
 			if not player.controls_locked and not info_panel.visible:
 				var buttons := {"Up": &"move_forward", "Down": &"move_backwards", "Left": &"move_left", "Right": &"move_right"}
 				for key in buttons:
@@ -76,16 +87,33 @@ func _input(event: InputEvent) -> void:
 					if button.is_visible_in_tree() and button.get_global_rect().has_point(event.position):
 						touch_moves[event.index] = buttons[key]
 						Input.action_press(buttons[key])
+						get_viewport().set_input_as_handled()
 						break
 		else:
+			touch_positions.erase(event.index)
 			if touch_moves.has(event.index):
 				var action: StringName = touch_moves[event.index]
 				touch_moves.erase(event.index)
 				if not touch_moves.values().has(action):
 					Input.action_release(action)
+				get_viewport().set_input_as_handled()
 			if event.index == look_touch_index:
 				look_touch_index = -1
 				player.stop_touch_look()
+				get_viewport().set_input_as_handled()
+	elif event is InputEventScreenDrag:
+		last_touch_msec = Time.get_ticks_msec()
+		if not touch_positions.has(event.index):
+			return
+		var previous: Vector2 = touch_positions[event.index]
+		touch_positions[event.index] = event.position
+		if event.index == look_touch_index:
+			# Track this finger globally, including when it crosses another GUI control.
+			# Absolute positions avoid mouse-relative deltas shared by multiple pointers.
+			player.apply_touch_look(event.position - previous)
+			get_viewport().set_input_as_handled()
+		elif touch_moves.has(event.index):
+			get_viewport().set_input_as_handled()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
@@ -95,6 +123,8 @@ func _release_touch_controls() -> void:
 	for action in [&"move_forward", &"move_backwards", &"move_left", &"move_right"]:
 		Input.action_release(action)
 	touch_moves.clear()
+	touch_positions.clear()
+	last_touch_msec = Time.get_ticks_msec()
 	look_touch_index = -1
 	if is_instance_valid(player):
 		player.stop_touch_look()
@@ -107,11 +137,7 @@ func _on_look_zone_input(event: InputEvent) -> void:
 		elif not event.pressed and event.index == look_touch_index:
 			look_touch_index = -1
 			$SafeArea/LookZone.accept_event()
-	elif event is InputEventScreenDrag and event.index == look_touch_index and not touch_moves.has(event.index):
-		look_touch_index = event.index
-		player.apply_touch_look(event.relative)
-		$SafeArea/LookZone.accept_event()
-	elif event is InputEventMouseMotion and event.device != -1 and Time.get_ticks_msec() - last_touch_msec > 700 and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+	elif event is InputEventMouseMotion and event.device != -1 and _mouse_input_allowed() and Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		player.apply_touch_look(event.relative)
 		$SafeArea/LookZone.accept_event()
 
@@ -384,6 +410,8 @@ func _safe_touch_rect() -> Rect2:
 func _resize_touch_layout() -> void:
 	_resize_information_panel()
 	var safe := _safe_touch_rect()
+	var view_size := get_viewport().get_visible_rect().size
+	_place_touch_control($SafeArea/LookZone, Rect2(Vector2(view_size.x * 0.32, 0), Vector2(view_size.x * 0.68, view_size.y)))
 	var edge := clampf(safe.size.y * 0.14, 76.0, 82.0)
 	var gap := 8.0
 	var span := edge * 3.0 + gap * 2.0
